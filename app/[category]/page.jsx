@@ -17,16 +17,16 @@ export default function NewsByCategory() {
         return <div>No se encontraron noticias en esta categoría</div>;
     }
 
-    const handleTitleClick = () => {
-        router.push('/'); // Redirigir a la homepage cuando se hace clic en el título
-    };
+    const handleBack = () => {
+        router.back(); // Esto hace que el navegador vuelva a la página anterior
+      };
 
     return (
         <div>
             {/* Título con tamaño grande, margen y funcionalidad de clic para redirigir a la homepage */}
             <h1
-                className='text-4xl font-bold text-gray-800 my-8 cursor-pointer hover:text-blue-500 transition-colors duration-300'
-                onClick={handleTitleClick}
+                className='text-2xl font-bold text-gray-800 my-8 cursor-pointer hover:text-blue-500 transition-colors duration-300 ml-6 pl-2'
+                onClick={handleBack}
             >
                 &larr; {category}
             </h1>

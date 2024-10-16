@@ -28,7 +28,7 @@ export const NewsProvider = ({ children }) => {
     {
       id: 3,
       imageUrl: '/path/to/image2.jpg',
-      title: 'Innovation in Green Energy',
+      title: 'Innovation in Green a',
       subtitle: 'El descubrimiento de el doctor hoffman permitio que las nutrias consuman cannabis',
       category: 'Science',
       description: 'How green energy is transforming the world.',

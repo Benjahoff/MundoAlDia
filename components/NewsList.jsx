@@ -15,10 +15,11 @@ export default function NewsList({news}) {
       {news.map((newsItem) => (
         <div key={newsItem.id}>
           <NewsItem
+            id={newsItem.id}
             imageUrl={newsItem.imageUrl}
             title={newsItem.title}
             category={newsItem.category}
-            description={newsItem.description}
+            subtitle={newsItem.subtitle}
             dateCreated={newsItem.dateCreated}
           />
         </div>
