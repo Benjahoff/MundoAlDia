@@ -4,13 +4,14 @@ import { useContext } from 'react';
 import { NewsContext } from '@/context/NewsContext';
 import NewsList from '@/components/NewsList';
 import { useParams, useRouter } from 'next/navigation';
+import Image from 'next/image';
+import arrowImage from '../../assets/arrow.png'
 
 export default function NewsByCategory() {
     const { category } = useParams();
     const { news } = useContext(NewsContext);
     const router = useRouter();
 
-    // Filtrar las noticias por categoría
     const filteredNews = news.filter(item => item.category.toLowerCase() === category.toLowerCase());
 
     if (filteredNews.length === 0) {
@@ -18,20 +19,17 @@ export default function NewsByCategory() {
     }
 
     const handleBack = () => {
-        router.back(); // Esto hace que el navegador vuelva a la página anterior
-      };
+        router.back(); 
+    };
 
     return (
         <div>
-            {/* Título con tamaño grande, margen y funcionalidad de clic para redirigir a la homepage */}
-            <h1
-                className='text-2xl font-bold text-gray-800 my-8 cursor-pointer hover:text-blue-500 transition-colors duration-300 ml-6 pl-2'
-                onClick={handleBack}
-            >
-                &larr; {category}
-            </h1>
 
-            {/* Lista de noticias filtradas */}
+            <div className="w-full h-[20px] mb-3 text-2xl font-bold text-gray-800 my-8 cursor-pointer flex items-center ml-6" onClick={() => handleBack()}>
+                <Image src={arrowImage} alt="left-arrow" width={20} height={16} />
+                <span className="ml-2">{category}</span>
+            </div>
+
             <NewsList news={filteredNews} />
         </div>
     );

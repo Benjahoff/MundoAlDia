@@ -1,72 +1,137 @@
-// NewsContext.js
-'use client'; // Asegúrate de que esto esté presente
-
-import { createContext, useState } from 'react';
+"use client";
+import { createContext, useState, useEffect } from "react";
+import axios from "axios";
+import Cookies from "js-cookie"; 
+import { toast } from "react-toastify";
 
 export const NewsContext = createContext();
 
 export const NewsProvider = ({ children }) => {
-  const initialNews = [
-    {
-      id: 1,
-      imageUrl: '/path/to/image1.jpg',
-      title: 'Architectural Engineering Wonders',
-      subtitle: 'El descubrimiento de el doctor hoffman permitio que las nutrias consuman cannabis',
-      category: 'Technology',
-      description: 'A look at modern architectural wonders.',
-      dateCreated: 'October 21, 2022',
-    },
-    {
-      id: 2,
-      imageUrl: '/path/to/image2.jpg',
-      title: 'Innovation in Green Energy',
-      subtitle: 'El descubrimiento de el doctor hoffman permitio que las nutrias consuman cannabis',
-      category: 'Science',
-      description: 'How green energy is transforming the world.',
-      dateCreated: 'October 22, 2022',
-    },
-    {
-      id: 3,
-      imageUrl: '/path/to/image2.jpg',
-      title: 'Innovation in Green a',
-      subtitle: 'El descubrimiento de el doctor hoffman permitio que las nutrias consuman cannabis',
-      category: 'Science',
-      description: 'How green energy is transforming the world.',
-      dateCreated: 'October 22, 2022',
-    },
-    {
-      id: 4,
-      imageUrl: '/path/to/image2.jpg',
-      title: 'Innovation in Green Energy',
-      subtitle: 'El descubrimiento de el doctor hoffman permitio que las nutrias consuman cannabis',
-      category: 'Science',
-      description: 'How green energy is transforming the world.',
-      dateCreated: 'October 22, 2022',
-    },
-    {
-      id: 5,
-      imageUrl: '/path/to/image2.jpg',
-      title: 'Innovation in Green Energy',
-      subtitle: 'El descubrimiento de el doctor hoffman permitio que las nutrias consuman cannabis',
-      category: 'Science',
-      description: 'How green energy is transforming the world.',
-      dateCreated: 'October 22, 2022',
-    },
-    {
-      id: 6,
-      imageUrl: '/path/to/image2.jpg',
-      title: 'Innovation in Green Energy',
-      subtitle: 'El descubrimiento de el doctor hoffman permitio que las nutrias consuman cannabis',
-      category: 'Science',
-      description: 'How green energy is transforming the world.',
-      dateCreated: 'October 22, 2022',
-    },
-  ];
+  const [news, setNews] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const [news, setNews] = useState(initialNews);
+
+  const fetchNews = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get("http://localhost:4000/news");
+      setNews(response.data.data);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching news:", error);
+      toast.error("Error al cargar las noticias");
+    }
+  };
+
+  useEffect(() => {
+    fetchNews();
+  }, []);
+
+  const addNews = async (newNews) => {
+    const toastId = toast.loading("Agregando noticia...");
+    const token = Cookies.get("token");
+    setLoading(true);
+    try {
+      const response = await axios.post("http://localhost:4000/news", newNews, {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.data.news) {
+        setNews((prevNews) => [...prevNews, response?.data.news]);
+        setLoading(false);
+        toast.update(toastId, {
+          render: "Noticia agregada correctamente.",
+          type: "success",
+          isLoading: false,
+          autoClose: 5000,
+        });
+      }
+    } catch (error) {
+      console.error("Error adding news:", error);
+      toast.update(toastId, {
+        render: "Error al agregar la noticia.",
+        type: "error",
+        isLoading: false,
+        autoClose: 5000,
+      });
+    }
+  };
+
+  const editNews = async (updatedNews) => {
+    const toastId = toast.loading("Actualizando noticia...");
+    const token = Cookies.get("token");
+    setLoading(true);
+    try {
+      const response = await axios.put(
+        `http://localhost:4000/news/${updatedNews.id}`,
+        updatedNews,
+        {
+          headers: {
+            authorization: `Bearer ${token}`, 
+          },
+        }
+      );
+      if (response.data.news) {
+        setNews((prevNews) =>
+          prevNews.map((newsItem) =>
+            newsItem._id === response.data.news._id
+              ? response.data.news
+              : newsItem
+          )
+        );
+        setLoading(false);
+      }
+      toast.update(toastId, {
+        render: "Noticia actualizada correctamente.",
+        type: "success",
+        isLoading: false,
+        autoClose: 5000,
+      });
+    } catch (error) {
+      console.error("Error editing news:", error);
+      toast.update(toastId, {
+        render: "Error al actualizar la noticia.",
+        type: "error",
+        isLoading: false,
+        autoClose: 5000,
+      });
+    }
+  };
+
+  const deleteNews = async (id) => {
+    const toastId = toast.loading("Eliminando noticia...");
+    const token = Cookies.get("token");
+    setLoading(true);
+    try {
+      await axios.delete(`http://localhost:4000/news/${id}`, {
+        headers: {
+          authorization: `Bearer ${token}`, // Agregar token en el header
+        },
+      });
+      setNews((prevNews) => prevNews.filter((newsItem) => newsItem._id !== id));
+      setLoading(false);
+      toast.update(toastId, {
+        render: "Noticia eliminada correctamente.",
+        type: "success",
+        isLoading: false,
+        autoClose: 5000,
+      });
+    } catch (error) {
+      console.error("Error deleting news:", error);
+      toast.update(toastId, {
+        render: "Error al eliminar la noticia.",
+        type: "error",
+        isLoading: false,
+        autoClose: 5000,
+      });
+    }
+  };
 
   return (
-    <NewsContext.Provider value={{ news }}>
+    <NewsContext.Provider
+      value={{ news, addNews, deleteNews, editNews, loading }}
+    >
       {children}
     </NewsContext.Provider>
   );

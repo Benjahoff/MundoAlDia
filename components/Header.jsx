@@ -1,21 +1,20 @@
 "use client";
 
-import { useState, useRef } from 'react';
-import { Dialog } from '@headlessui/react';
+import { useContext, useState } from 'react';
 import Image from 'next/image';
 import logo from '../assets/logo.png';
 import user from '../assets/user.png';
 import { useRouter } from 'next/navigation';
+import AuthModal from './AuthModal';
+import { toast } from 'react-toastify';
+import { AuthContext } from '@/context/AutContext';
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
-  const [isLogin, setIsLogin] = useState(true); // Controlar si es login o registro
-  const [modalPosition, setModalPosition] = useState({ top: 0, left: 0 });
-
-  const loginButtonRef = useRef(null); // Referencia al botón de login
-  const signinButtonRef = useRef(null); // Referencia al botón de signin
+  const [isLogin, setIsLogin] = useState(true);
   const router = useRouter();
+  const { isAuthenticated, logout } = useContext(AuthContext);
 
   const goToHome = () => {
     router.push('/');
@@ -25,34 +24,62 @@ export default function Header() {
     router.push(`/${cat}`);
   };
 
-  const openModal = (isLoginForm, ref) => {
-    if (isLoginForm) {
-      const rect = ref.current.getBoundingClientRect();
-      const screenWidth = window.innerWidth;
-      let adjustedLeft = rect.left + window.scrollX;
-
-      if (rect.left + 300 > screenWidth) {  
-        adjustedLeft = screenWidth - 320;
-      }
-
-      setModalPosition({ top: rect.bottom + window.scrollY, left: adjustedLeft });
-    }
-
+  const openModal = (isLoginForm) => {
     setIsLogin(isLoginForm);
     setModalOpen(true);
   };
+
+  const closeModal = () => {
+    setModalOpen(false);
+  };
+
+
+  const logoutFn = async () => {
+    const toastId = toast.loading("Cerrando sesión...");
+
+    try {
+      const response = await fetch('http://localhost:4000/user/logout', {
+        method: 'GET',
+        credentials: 'include',
+      });
+      console.log(response)
+      if (response.ok) {
+        logout()
+        toast.update(toastId, {
+          render: "Sesión cerrada con éxito",
+          type: "success",
+          isLoading: false,
+          autoClose: 2000
+        });
+
+      } else {
+        toast.update(toastId, {
+          render: "Error al cerrar sesión",
+          type: "error",
+          isLoading: false,
+          autoClose: 2000
+        });
+      }
+    } catch (error) {
+      toast.update(toastId, {
+        render: "Error en el servidor",
+        type: "error",
+        isLoading: false,
+        autoClose: 2000
+      });
+    }
+  };
+
   const menuItems = [
-    'Últimas Noticias',
-    'Política',
-    'Economía',
+    'Politica',
     'Deportes',
-    'Sociedad',
-    'Policiales',
-    'science'
+    'Economia',
+    'Tecnologia',
+    'Internacionales'
   ];
 
   return (
-    <header className="bg-white shadow-md shadow-cream-200 p-4 fixed w-full z-10">
+    <header className="bg-white shadow-md shadow-cream-200 p-4 fixed w-full z-20 top-0">
       <div className="text-center my-2 h-16 flex items-center justify-center">
         <button
           className="text-gray-800 focus:outline-none md:hidden mt-2"
@@ -115,112 +142,33 @@ export default function Header() {
         </nav>
 
         <div className="absolute right-4 flex space-x-4">
-          <button
-            ref={loginButtonRef}
-            onClick={() => openModal(true, loginButtonRef)}
-            className="bg-white border border-gray-300 text-gray-800 rounded-full px-4 py-2 hover:bg-gray-100"
-          >
-            Login
-          </button>
-          <button
-            ref={signinButtonRef}
-            onClick={() => openModal(false, signinButtonRef)}
-            className="bg-white border border-gray-300 text-gray-800 rounded-full px-4 py-2 hover:bg-gray-100"
-          >
-            Signin
-          </button>
+          {!isAuthenticated ? <>
+            <button
+              onClick={() => openModal(true)}
+              name='loginBtn'
+              className="bg-white border border-gray-300 text-gray-800 rounded-full px-4 py-2 hover:bg-gray-100"
+            >
+              Login
+            </button>
+            <button
+              onClick={() => openModal(false)}
+              className="bg-white border border-gray-300 text-gray-800 rounded-full px-4 py-2 hover:bg-gray-100"
+            >
+              Signin
+            </button>
+            <AuthModal isLogin={isLogin} modalOpen={modalOpen} closeModal={closeModal} />
+          </>
+            :
+            <button
+              onClick={() => logoutFn()}
+              className="bg-white border border-gray-300 text-gray-800 rounded-full px-4 py-2 hover:bg-gray-100"
+            >
+              LogOut
+            </button>
+          }
         </div>
       </div>
 
-      {modalOpen &&
-        (isLogin ? (
-          <>
-            <Dialog open={modalOpen} onClose={() => setModalOpen(false)}>
-              <div
-                className="fixed"
-                style={{ top: modalPosition.top, left: modalPosition.left }}
-              >
-                <div className="bg-white p-6 rounded-lg shadow-lg">
-                  <h2 className="text-xl font-bold mb-4">Iniciar Sesión</h2>
-                  <form className="space-y-4">
-                    <input
-                      type="email"
-                      placeholder="Email"
-                      className="border p-2 w-full"
-                    />
-                    <input
-                      type="password"
-                      placeholder="Contraseña"
-                      className="border p-2 w-full"
-                    />
-                    <button
-                      type="submit"
-                      className="w-full bg-blue-400 text-white p-2 rounded hover:bg-blue-500"
-                    >
-                      Iniciar Sesión
-                    </button>
-                  </form>
-
-                  <button
-                    className="mt-4 text-gray-500 underline"
-                    onClick={() => setModalOpen(false)}
-                  >
-                    Cerrar
-                  </button>
-                </div>
-              </div>
-            </Dialog>
-          </>
-        ) : (
-          <>
-            <Dialog open={modalOpen} onClose={() => setModalOpen(false)}>
-              <div
-                className="fixed"
-                style={{ top: modalPosition.top, left: modalPosition.left }}
-              >
-                <div className="bg-white p-6 rounded-lg shadow-lg">
-                  <h2 className="text-xl font-bold mb-4">Registro</h2>
-                  <form className="space-y-4">
-                    <input
-                      type="text"
-                      placeholder="Nombre"
-                      className="border p-2 w-full"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Apellido"
-                      className="border p-2 w-full"
-                    />
-                    <input
-                      type="email"
-                      placeholder="Email"
-                      className="border p-2 w-full"
-                    />
-                    <input
-                      type="password"
-                      placeholder="Contraseña"
-                      className="border p-2 w-full"
-                    />
-                    <button
-                      type="submit"
-                      className="w-full bg-blue-400 text-white p-2 rounded hover:bg-blue-500"
-                    >
-                      Registrarse
-                    </button>
-                  </form>
-
-                  <button
-                    className="mt-4 text-gray-500 underline"
-                    onClick={() => setModalOpen(false)}
-                  >
-                    Cerrar
-                  </button>
-                </div>
-              </div>
-            </Dialog>
-          </>
-        ))
-      }
-    </header >
+    </header>
   );
 }
