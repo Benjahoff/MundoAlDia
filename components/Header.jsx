@@ -40,9 +40,8 @@ export default function Header() {
   
     try {
       const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/user/logout`);
-      // Verificamos si la respuesta tiene un código de estado exitoso
       if (response.status == 200) {
-        logout(); // Aquí llamas a la función `logout` que debe manejar el cierre de sesión
+        logout();
         toast.update(toastId, {
           render: "Sesión cerrada con éxito",
           type: "success",
@@ -58,7 +57,7 @@ export default function Header() {
         });
       }
     } catch (error) {
-      console.error(error); // Esto es útil para depuración
+      console.error(error);
       toast.update(toastId, {
         render: "Error en el servidor",
         type: "error",

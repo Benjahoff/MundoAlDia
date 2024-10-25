@@ -25,20 +25,19 @@ export default function AuthModal({ isLogin, modalOpen, closeModal }) {
         try {
             const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}${endpoint}`, payload);
             
-            const data = response.data; // Axios ya retorna JSON directamente en `response.data`
+            const data = response.data; 
     
-            // Manejo del éxito o error basado en la respuesta del servidor
-            if (response.status === 200 || response.status === 201) {  // Verifica los códigos de estado exitosos
+            if (response.status === 200 || response.status === 201) {
                 if (isLogin) {
-                    Cookies.set('token', data.token, { expires: 1 / 24 }); // Expira en 1 hora
+                    Cookies.set('token', data.token, { expires: 1 / 24 });
                     Cookies.set('username', data.user.username, { expires: 1 / 24 });
                     Cookies.set('email', data.user.email, { expires: 1 / 24 });
-                    login(); // Asumo que tienes una función `login` definida en tu contexto
+                    login();
                     toast.success('Inicio de sesión exitoso');
                 } else {
                     toast.success('Registro exitoso');
                 }
-                closeModal(); // Asumo que tienes una función `closeModal`
+                closeModal();
             } else {
                 setErrors(data.errors || {});
                 toast.error(data.message || 'Algo salió mal');
