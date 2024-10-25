@@ -14,6 +14,7 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
+  const [userMenuOpen, setUserMenuOpen] = useState(false); // Nueva variable para controlar solo el menú de usuario
   const router = useRouter();
   const { isAuthenticated, logout } = useContext(AuthContext);
 
@@ -28,12 +29,12 @@ export default function Header() {
   const openModal = (isLoginForm) => {
     setIsLogin(isLoginForm);
     setModalOpen(true);
+    setUserMenuOpen(false); // Cerrar el menú de usuario al abrir el modal
   };
 
   const closeModal = () => {
     setModalOpen(false);
   };
-
 
   const logoutFn = async () => {
     const toastId = toast.loading("Cerrando sesión...");
@@ -99,15 +100,37 @@ export default function Header() {
         </button>
         <Image src={logo} alt="logo" width={160} height={110} className="mx-auto cursor-pointer" onClick={goToHome} />
 
-        <div className="rounded-full overflow-hidden w-8 h-8 md:hidden mt-2">
-          <Image
-            src={user}
-            alt="User"
-            width={22}
-            height={22}
-            className="cursor-pointer"
-            onClick={() => setModalOpen(true)}
-          />
+        {/* Mobile user icon with login/sign up dropdown */}
+        <div className="relative">
+          <div className="rounded-full overflow-hidden w-8 h-8 md:hidden mt-2">
+            <Image
+              src={user}
+              alt="User"
+              width={22}
+              height={22}
+              className="cursor-pointer"
+              onClick={() => setUserMenuOpen(!userMenuOpen)} // Controlar solo el menú de usuario
+            />
+          </div>
+
+          {userMenuOpen && (
+            <div className="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg z-10">
+              <ul className="py-2">
+                <li
+                  onClick={() => openModal(true)}  // Abre el modal de login
+                  className="block px-4 py-2 text-gray-800 hover:bg-gray-100 cursor-pointer"
+                >
+                  Login
+                </li>
+                <li
+                  onClick={() => openModal(false)}  // Abre el modal de registro
+                  className="block px-4 py-2 text-gray-800 hover:bg-gray-100 cursor-pointer"
+                >
+                  Sign Up
+                </li>
+              </ul>
+            </div>
+          )}
         </div>
       </div>
 
@@ -166,6 +189,8 @@ export default function Header() {
         </div>
       </div>
 
+      {/* Modal for login and signup */}
+      <AuthModal isLogin={isLogin} modalOpen={modalOpen} closeModal={closeModal} />
     </header>
   );
 }
