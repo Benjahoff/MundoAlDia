@@ -12,7 +12,7 @@ export default function ModalNews({ onClose, isOpen, newsId = false }) {
   const [isEdit, setIsEdit] = useState(false)
   const [categories] = useState([
     { id: 1, label: "Politica", value: 'Politica' },
-    { id: 2, label: 'Deportes', value: 'Ciencia' },
+    { id: 2, label: 'Deportes', value: 'Deportes' },
     { id: 3, label: 'Tecnologia', value: 'Tecnologia' },
     { id: 4, label: 'Economia', value: 'Economia' },
     { id: 5, label: 'Internacionales', value: 'Internacionales' },
