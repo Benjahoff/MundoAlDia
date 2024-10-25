@@ -106,7 +106,7 @@ export const NewsProvider = ({ children }) => {
     try {
       await axios.delete(`http://localhost:4000/news/${id}`, {
         headers: {
-          authorization: `Bearer ${token}`, // Agregar token en el header
+          authorization: `Bearer ${token}`,
         },
       });
       setNews((prevNews) => prevNews.filter((newsItem) => newsItem._id !== id));
