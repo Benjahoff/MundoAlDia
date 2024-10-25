@@ -21,29 +21,3 @@ You can start editing the page by modifying `app/page.js`. The page auto-updates
 
 This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
-## Setting up the Backend
-
-To run the backend, follow these steps:
-
-1. Navigate to the `api` folder:
-   ```bash
-   cd api
-   ```
-
-2. Install the dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Navigate to the `src` folder:
-   ```bash
-   cd src
-   ```
-
-4. Start the backend server:
-   ```bash
-   node index.js
-   ```
-
-Make sure you have configured your environment variables and database before running the backend.
-
