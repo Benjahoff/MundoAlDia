@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import AuthModal from './AuthModal';
 import { toast } from 'react-toastify';
 import { AuthContext } from '@/context/AutContext';
+import axios from "axios";
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -36,40 +37,37 @@ export default function Header() {
 
   const logoutFn = async () => {
     const toastId = toast.loading("Cerrando sesión...");
-
+  
     try {
-      const response = await fetch('http://localhost:4000/user/logout', {
-        method: 'GET',
-        credentials: 'include',
-      });
-      console.log(response)
-      if (response.ok) {
-        logout()
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/user/logout`);
+      // Verificamos si la respuesta tiene un código de estado exitoso
+      if (response.status == 200) {
+        logout(); // Aquí llamas a la función `logout` que debe manejar el cierre de sesión
         toast.update(toastId, {
           render: "Sesión cerrada con éxito",
           type: "success",
           isLoading: false,
-          autoClose: 2000
+          autoClose: 2000,
         });
-
       } else {
         toast.update(toastId, {
           render: "Error al cerrar sesión",
           type: "error",
           isLoading: false,
-          autoClose: 2000
+          autoClose: 2000,
         });
       }
     } catch (error) {
+      console.error(error); // Esto es útil para depuración
       toast.update(toastId, {
         render: "Error en el servidor",
         type: "error",
         isLoading: false,
-        autoClose: 2000
+        autoClose: 2000,
       });
     }
   };
-
+  
   const menuItems = [
     'Politica',
     'Deportes',

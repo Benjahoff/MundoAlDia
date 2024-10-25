@@ -10,7 +10,7 @@ import ModalNews from './ModalNews';
 import { parseDate } from '@/functions';
 import { AuthContext } from '@/context/AutContext';
 
-export default function NewsItem({ id, urlToImage, title, category, subtitle, publishedAt, key}) {
+export default function NewsItem({ id, urlToImage, title, category, subtitle, publishedAt}) {
   const router = useRouter();
   const [isModalDeleteOpen, setIsModalDeleteOpen] = useState(false);
   const [isModalEditOpen, setIsModalEditOpen] = useState(false);

@@ -13,7 +13,6 @@ export default function NewsList({news}) {
       {news.map((newsItem,index) => (
         <div key={newsItem._id}>
           <NewsItem
-            key={index}
             id={newsItem._id}
             urlToImage={newsItem.urlToImage}
             title={newsItem.title}

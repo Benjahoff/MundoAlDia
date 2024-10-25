@@ -14,7 +14,7 @@ export const NewsProvider = ({ children }) => {
   const fetchNews = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("http://localhost:4000/news");
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/news`);
       setNews(response.data.data);
       setLoading(false);
     } catch (error) {
@@ -32,7 +32,7 @@ export const NewsProvider = ({ children }) => {
     const token = Cookies.get("token");
     setLoading(true);
     try {
-      const response = await axios.post("http://localhost:4000/news", newNews, {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/news`, newNews, {
         headers: {
           authorization: `Bearer ${token}`,
         },
@@ -64,7 +64,7 @@ export const NewsProvider = ({ children }) => {
     setLoading(true);
     try {
       const response = await axios.put(
-        `http://localhost:4000/news/${updatedNews.id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/news/${updatedNews.id}`,
         updatedNews,
         {
           headers: {
@@ -104,7 +104,7 @@ export const NewsProvider = ({ children }) => {
     const token = Cookies.get("token");
     setLoading(true);
     try {
-      await axios.delete(`http://localhost:4000/news/${id}`, {
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/news/${id}`, {
         headers: {
           authorization: `Bearer ${token}`,
         },

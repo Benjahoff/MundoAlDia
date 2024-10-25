@@ -1,60 +1,54 @@
 "use client";
 import { Dialog } from '@headlessui/react';
 import { useContext, useState } from 'react';
-import { toast, ToastContainer } from 'react-toastify';
-import { Input, Button } from '@nextui-org/react'; 
-import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai'; 
-import Cookies from 'js-cookie'; 
+import { toast } from 'react-toastify';
+import { Input, Button } from '@nextui-org/react';
+import Cookies from 'js-cookie';
 import { AuthContext } from '@/context/AutContext';
+import axios from "axios";
 
 export default function AuthModal({ isLogin, modalOpen, closeModal }) {
-    const [username, setUsername] = useState('');  
+    const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [errors, setErrors] = useState({}); 
-    const [isVisible, setIsVisible] = useState(false); 
+    const [errors, setErrors] = useState({});
     const { login } = useContext(AuthContext);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+    
         const endpoint = isLogin ? '/user/login' : '/user/register';
         const payload = isLogin
             ? { email, password }
             : { username, email, password };
-
+    
         try {
-            const response = await fetch(`http://localhost:4000${endpoint}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload),
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
+            const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}${endpoint}`, payload);
+            
+            const data = response.data; // Axios ya retorna JSON directamente en `response.data`
+    
+            // Manejo del éxito o error basado en la respuesta del servidor
+            if (response.status === 200 || response.status === 201) {  // Verifica los códigos de estado exitosos
                 if (isLogin) {
-                    Cookies.set('token', data.token, { expires: 1 / 24 });
+                    Cookies.set('token', data.token, { expires: 1 / 24 }); // Expira en 1 hora
                     Cookies.set('username', data.user.username, { expires: 1 / 24 });
                     Cookies.set('email', data.user.email, { expires: 1 / 24 });
-                    login()
+                    login(); // Asumo que tienes una función `login` definida en tu contexto
                     toast.success('Inicio de sesión exitoso');
                 } else {
                     toast.success('Registro exitoso');
                 }
-                closeModal(); 
+                closeModal(); // Asumo que tienes una función `closeModal`
             } else {
                 setErrors(data.errors || {});
                 toast.error(data.message || 'Algo salió mal');
             }
         } catch (error) {
+            console.error(error);
             toast.error('Error en el servidor');
         }
     };
-
-    const toggleVisibility = () => setIsVisible(!isVisible);
+    
 
     return (
         <>
@@ -93,22 +87,13 @@ export default function AuthModal({ isLogin, modalOpen, closeModal }) {
                         />
                         <Input
                             label="Contraseña"
-                            type={isVisible ? "text" : "password"}
+                            type={"password"}
                             variant="bordered"
                             name='loginPass'
                             fullWidth
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             helperText={errors.password}
-                            /* endContent={
-                                <button className="focus:outline-none" type="button" onClick={toggleVisibility} aria-label="toggle password visibility">
-                                  {isVisible ? (
-                                    <AiFillEyeInvisible className="text-2xl text-default-400 pointer-events-none" />
-                                  ) : (
-                                    <AiFillEye  className="text-2xl text-default-400 pointer-events-none" />
-                                  )}
-                                </button>
-                              } */
                             status={errors.password ? 'error' : 'default'}
                         />
                         <Button type="submit" color="primary" className="w-full" id='loginBtn'>
